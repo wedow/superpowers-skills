@@ -39,30 +39,30 @@ bd quickstart        # See tutorial
 ### Core Workflow
 ```bash
 bd create "task description"         # Create new issue
-bd create "task" --deps blocks:dash-1  # Create with blocker
+bd create "task" --deps blocks:proj-1  # Create with blocker
 bd list                              # Show all issues
 bd ready                             # Show unblocked work (no blockers)
 bd blocked                           # Show blocked issues
-bd show dash-123                     # Show issue details
-bd update dash-123 --title "new"    # Update issue
-bd close dash-123                    # Close issue
+bd show proj-123                     # Show issue details
+bd update proj-123 --title "new"    # Update issue
+bd close proj-123                    # Close issue
 ```
 
 ### Dependency Management
 ```bash
-bd dep add dash-123 dash-456 --type blocks         # 123 blocks 456
-bd dep remove dash-123 dash-456                    # Remove dependency
-bd dep add dash-123 dash-456 --type related        # Mark related
-bd dep add dash-123 dash-456 --type parent-child   # 123 parent of 456
-bd dep add dash-123 dash-456 --type discovered-from # 456 discovered from 123
-bd dep tree dash-123                                # Show dependency tree
+bd dep add proj-123 proj-456 --type blocks         # 123 blocks 456
+bd dep remove proj-123 proj-456                    # Remove dependency
+bd dep add proj-123 proj-456 --type related        # Mark related
+bd dep add proj-123 proj-456 --type parent-child   # 123 parent of 456
+bd dep add proj-123 proj-456 --type discovered-from # 456 discovered from 123
+bd dep tree proj-123                                # Show dependency tree
 bd dep cycles                                       # Detect cycles
 ```
 
 ### JSON Output (for programmatic use)
 ```bash
 bd list --json                       # Machine-readable output
-bd show dash-123 --json
+bd show proj-123 --json
 ```
 
 ## When to Use Beads
@@ -73,17 +73,17 @@ When a user describes work with 3+ steps or dependencies:
 ```bash
 # Example: "Add authentication with OAuth and session management"
 bd create "Design authentication architecture"
-bd create "Implement OAuth integration" --deps blocks:dash-1
-bd create "Add session management" --deps blocks:dash-2
-bd create "Write auth tests" --deps blocks:dash-2,blocks:dash-3
+bd create "Implement OAuth integration" --deps blocks:proj-1
+bd create "Add session management" --deps blocks:proj-2
+bd create "Write auth tests" --deps blocks:proj-2,blocks:proj-3
 ```
 
 ### During Implementation
 When you discover new subtasks or blockers:
 
 ```bash
-bd create "Fix bug in user model" --deps discovered-from:dash-5
-bd dep add dash-7 dash-8 --type blocks    # dash-7 blocks dash-8
+bd create "Fix bug in user model" --deps discovered-from:proj-5
+bd dep add proj-7 proj-8 --type blocks    # proj-7 blocks proj-8
 ```
 
 ### Finding Ready Work
@@ -91,8 +91,8 @@ When deciding what to work on next:
 
 ```bash
 bd ready             # Shows unblocked issues
-bd show dash-15      # Check details before starting
-bd update dash-15 --status in-progress
+bd show proj-15      # Check details before starting
+bd update proj-15 --status in-progress
 ```
 
 ### Session Boundaries
@@ -116,29 +116,29 @@ bd stats             # Show statistics
 ### Blocks
 Task A must complete before Task B can start.
 ```bash
-bd dep add dash-1 dash-2 --type blocks    # dash-1 blocks dash-2
+bd dep add proj-1 proj-2 --type blocks    # proj-1 blocks proj-2
 # Or create with dependency:
-bd create "Task B" --deps blocks:dash-1
+bd create "Task B" --deps blocks:proj-1
 ```
 
 ### Parent-Child
 Task B is a subtask of Task A.
 ```bash
-bd dep add dash-1 dash-2 --type parent-child   # dash-1 is parent of dash-2
+bd dep add proj-1 proj-2 --type parent-child   # proj-1 is parent of proj-2
 ```
 
 ### Related
 Tasks are connected but not dependent.
 ```bash
-bd dep add dash-1 dash-2 --type related   # dash-1 and dash-2 related
+bd dep add proj-1 proj-2 --type related   # proj-1 and proj-2 related
 ```
 
 ### Discovered-From
 Task B was discovered while working on Task A.
 ```bash
-bd dep add dash-1 dash-2 --type discovered-from  # dash-2 discovered from dash-1
+bd dep add proj-1 proj-2 --type discovered-from  # proj-2 discovered from proj-1
 # Or create with dependency:
-bd create "Fix found bug" --deps discovered-from:dash-1
+bd create "Fix found bug" --deps discovered-from:proj-1
 ```
 
 ## Status Values
@@ -149,8 +149,8 @@ bd create "Fix found bug" --deps discovered-from:dash-1
 
 Change status:
 ```bash
-bd update dash-123 --status in-progress
-bd close dash-123                        # Mark closed
+bd update proj-123 --status in-progress
+bd close proj-123                        # Mark closed
 ```
 
 ## Best Practices
@@ -164,10 +164,10 @@ Convert user requests into atomic issues with dependencies:
 ```bash
 # User: "Build a dashboard with charts and filters"
 bd create "Design dashboard layout"
-bd create "Implement data fetching" --deps blocks:dash-1
-bd create "Add chart components" --deps blocks:dash-2
-bd create "Add filter UI" --deps blocks:dash-2
-bd create "Connect filters to charts" --deps blocks:dash-3,blocks:dash-4
+bd create "Implement data fetching" --deps blocks:proj-1
+bd create "Add chart components" --deps blocks:proj-2
+bd create "Add filter UI" --deps blocks:proj-2
+bd create "Connect filters to charts" --deps blocks:proj-3,blocks:proj-4
 ```
 
 ### 3. Use Ready Work
@@ -177,7 +177,7 @@ Always check `bd ready` before starting new work.
 When debugging reveals new work:
 
 ```bash
-bd create "Fix database connection pool" --deps discovered-from:dash-47
+bd create "Fix database connection pool" --deps discovered-from:proj-47
 ```
 
 ### 5. Commit JSONL Files
@@ -196,7 +196,7 @@ git commit -m "Track new features and dependencies"
 
 ### 6. Visualize Dependencies
 ```bash
-bd dep tree dash-123     # Show dependency tree
+bd dep tree proj-123     # Show dependency tree
 bd dep cycles            # Detect circular dependencies
 ```
 
@@ -226,20 +226,20 @@ Each worktree shares the same Beads database via git:
 ```bash
 dash new feature-x
 bd ready                   # See unblocked issues
-# Work on dash-15
-bd close dash-15
-git add .beads/*.jsonl && git commit -m "Complete dash-15"
+# Work on proj-15
+bd close proj-15
+git add .beads/*.jsonl && git commit -m "Complete proj-15"
 ```
 
 ### With Subagent Development
 Assign issues to parallel subagents:
 
 ```bash
-bd ready                   # Shows dash-10, dash-11, dash-12
-# Assign dash-10 to subagent 1
-bd update dash-10 --assignee subagent-1 --status in-progress
-# Assign dash-11 to subagent 2
-bd update dash-11 --assignee subagent-2 --status in-progress
+bd ready                   # Shows proj-10, proj-11, proj-12
+# Assign proj-10 to subagent 1
+bd update proj-10 --assignee subagent-1 --status in-progress
+# Assign proj-11 to subagent 2
+bd update proj-11 --assignee subagent-2 --status in-progress
 ```
 
 ## Common Patterns
@@ -247,27 +247,27 @@ bd update dash-11 --assignee subagent-2 --status in-progress
 ### Feature Development
 ```bash
 bd create "Feature: User profiles" --type epic
-bd create "Design profile schema" --deps parent-child:dash-100
-bd create "Implement profile CRUD" --deps parent-child:dash-100,blocks:dash-101
-bd create "Add profile UI" --deps parent-child:dash-100,blocks:dash-102
-bd create "Write profile tests" --deps parent-child:dash-100,blocks:dash-102,blocks:dash-103
+bd create "Design profile schema" --deps parent-child:proj-100
+bd create "Implement profile CRUD" --deps parent-child:proj-100,blocks:proj-101
+bd create "Add profile UI" --deps parent-child:proj-100,blocks:proj-102
+bd create "Write profile tests" --deps parent-child:proj-100,blocks:proj-102,blocks:proj-103
 ```
 
 ### Bug Investigation
 ```bash
 bd create "Bug: Login fails intermittently" --type bug
-bd update dash-200 --status in-progress
+bd update proj-200 --status in-progress
 # Investigation reveals root cause
-bd create "Fix session timeout handling" --deps discovered-from:dash-200
-bd dep add dash-200 dash-201 --type related
+bd create "Fix session timeout handling" --deps discovered-from:proj-200
+bd dep add proj-200 proj-201 --type related
 ```
 
 ### Refactoring
 ```bash
 bd create "Refactor: Extract auth module" --type epic
-bd create "Move auth code to module" --deps parent-child:dash-300
-bd create "Update imports" --deps parent-child:dash-300,blocks:dash-301
-bd create "Update tests" --deps parent-child:dash-300,blocks:dash-301
+bd create "Move auth code to module" --deps parent-child:proj-300
+bd create "Update imports" --deps parent-child:proj-300,blocks:proj-301
+bd create "Update tests" --deps parent-child:proj-300,blocks:proj-301
 ```
 
 ## Troubleshooting
